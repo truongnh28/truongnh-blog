@@ -25,9 +25,8 @@ Ta sẽ giải quyết các trường hợp sau:
 
 - Người dùng thực hiện yêu cầu đọc hoặc ghi
   - Dịch vụ xử lý, lưu trữ dữ liệu người dùng sau đó trả kết quả.
-- Dịch vụ cần phát triển từ việc phục vụ một lượng nhỏ người dùng lên hàng triệu người dùng
-  - Thảo luận về các mô hình chia tỷ lệ chung khi chúng tôi phát triển một kiến ​​trúc để xử lý một số lượng lớn người dùng và yêu cầu
-  - Dịch vụ có tính khả dụng cao
+- Hệ thống có tính chịu tải lớn.
+- Hệ thống có tính khả dụng cao.
   
 #### Hạn chế và giả định
 
@@ -35,11 +34,6 @@ Ta sẽ giải quyết các trường hợp sau:
    - Lưu lượng truy cập phân bố không đồng đều.
    - Cần cơ sở dữ liệu quan hệ.
    - Quy mô từ 1 đến hàng triệu người dùng.
-   - Biểu thị sự gia tăng của người dùng là:
-     - Người dùng +
-     - Người dùng ++
-     - Người dùng +++
-     - ....
    - 1 triệu người dùng.
    - 1 triệu lượt viết mỗi tháng.
    - 500 triệu lượt đọc mỗi tháng
@@ -73,8 +67,8 @@ Với số lượng người dùng nhỏ:
    - Xử lý các yêu cầu.
    - Lưu trữ database MySQL.
 2. Sử dụng vertical scaling:
-   - Đơn giản chỉ cần chọn một hộp lớn hơn
-   - Theo dõi các chỉ số để xác định cách mở rộng quy mô
+   - Đơn giản chỉ cần chọn một hộp lớn hơn.
+   - Theo dõi các chỉ số để xác định cách mở rộng quy mô.
    - Sử dụng giám sát cơ bản để xác định tắc nghẽn: CPU, bộ nhớ, IO, mạng, v.v.
    - Mở rộng quy mô theo chiều dọc có thể rất tốn kém.
    - Không có backup.
@@ -84,44 +78,44 @@ Với số lượng người dùng nhỏ:
 4. DNS
    - Gán IP của Web Server với một tên miền.
 5. Bảo mật Web Server
-   - Chỉ mở các cổng cần thiết
+   - Chỉ mở các cổng cần thiết.
      - Cho phép máy chủ web phản hồi các yêu cầu đến từ:
-       - 80 cho HTTP
-       - 443 cho HTTPS
+       - 80 cho HTTP.
+       - 443 cho HTTPS.
        - 22 cho SSH đến chỉ các IP có trong danh sách cho phép.
      - Ngăn Web Server có các kết nối ra.
 
 ### Mở rộng thiết kế
 
-![Bản thiết kế với số lượng người dùng lớn](system_design_scaling.png)
+![Bản thiết kế với số lượng người dùng lớn](system_design_scaling.drawio.png)
 
 1. Mở rộng Web Server theo horizontal scaling.
-    - Sử dụng nhiều Web Server
+    - Sử dụng nhiều Web Server.
     - Thêm các Load Balancer như HAProxy.
     - Mở rộng SQL theo dạng phân tán.
 2. Ta sử dụng CDN
-    - Sử dụng Object Store để quản lý nội dung tĩnh
-      - Khả năng mở rộng cao và đáng tin cậy
-      - Mã hóa phía máy chủ
+    - Sử dụng Object Store để quản lý nội dung tĩnh.
+      - Khả năng mở rộng cao và đáng tin cậy.
+      - Mã hóa phía máy chủ.
     - Di chuyển các nội dung tĩnh vào đây:
-      - User file
-      - JS
-      - CSS
-      - Hình ảnh
-      - Video
+      - User file.
+      - JS.
+      - CSS.
+      - Hình ảnh.
+      - Video.
 3. Thêm một Memory Caching (Redis)
     - Data được truy cập thường xuyên từ database.
     - Data session từ Web Server.
 4. Mở rộng Database
-    - Chỉ lưu trữ dữ liệu trong một khoảng thời gian giới hạn trong cơ sở dữ liệu, trong khi lưu trữ phần còn lại trong một kho dữ liệu chẳng hạn như Redshift
-      - Một kho dữ liệu như Redshift có thể thoải mái xử lý giới hạn 1 TB nội dung mới mỗi tháng
-    - Với 200 yêu cầu đọc trung bình mỗi giây, lưu lượng đọc cho nội dung phổ biến có thể được giải quyết bằng cách mở rộng Bộ nhớ cache , điều này cũng hữu ích để xử lý lưu lượng truy cập được phân bổ không đồng đều và lưu lượng truy cập tăng đột biến
+    - Chỉ lưu trữ dữ liệu trong một khoảng thời gian giới hạn trong cơ sở dữ liệu, trong khi lưu trữ phần còn lại trong một kho dữ liệu chẳng hạn như Redshift.
+      - Một kho dữ liệu như Redshift có thể thoải mái xử lý giới hạn 1 TB nội dung mới mỗi tháng.
+    - Với 200 yêu cầu đọc trung bình mỗi giây, lưu lượng đọc cho nội dung phổ biến có thể được giải quyết bằng cách mở rộng Bộ nhớ cache , điều này cũng hữu ích để xử lý lưu lượng truy cập được phân bổ không đồng đều và lưu lượng truy cập tăng đột biến.
 5. Bảo mật hệ thống
-    - Mã hóa dữ liệu khi chuyển tiếp và ở trạng thái nghỉ
+    - Mã hóa dữ liệu khi chuyển tiếp và ở trạng thái nghỉ.
     - Sử dụng VPC(Virtual Private Cloud)
-      - Tạo một mạng con công cộng cho Web Server duy nhất để nó có thể gửi và nhận lưu lượng truy cập từ internet
-      - Tạo một mạng con riêng cho mọi thứ khác, ngăn chặn sự truy cập từ bên ngoài
-      - Chỉ mở các cổng từ các IP có trong danh sách cho phép cho phép  
+      - Tạo một mạng con công cộng cho Web Server duy nhất để nó có thể gửi và nhận lưu lượng truy cập từ internet.
+      - Tạo một mạng con riêng cho mọi thứ khác, ngăn chặn sự truy cập từ bên ngoài.
+      - Chỉ mở các cổng từ các IP có trong danh sách cho phép cho phép.
 
 Sắp tới mình sẽ có một bản demo về vấn đề này ở [**link này**](https://github.com/truongnh28). Mình sẽ cố gắng cập nhật sớm nhất.
 
@@ -132,8 +126,12 @@ Trên đây chỉ là hiểu biết của mình thông qua việc tìm hiểu mo
 ## Tham khảo
 
 [system-design-primer](https://github.com/donnemartin/system-design-primer)
-{{< css.inline >}}
+
 <style>
 .canon { background: white; width: 100%; height: auto; }
 </style>
-{{< /css.inline >}}
+<!-- {{< css.inline >}}
+<style>
+.canon { background: white; width: 100%; height: auto; }
+</style>
+{{< /css.inline >}} -->
